@@ -1,6 +1,9 @@
-<center>
-  <img src="src/assets/maco_brand_asset.png" alt="Maco" width="200">
-</center>
+<p align="center">
+<img src="src/assets/maco_brand_asset.png" alt="Maco" width="200">
+</p>
+<p align="center">
+<img src="repo-assets/windows-desktop-screenshot-1.jpg" alt="Maco Desktop Screenshot" height="375">
+</p>
 
 # Maco
 
@@ -14,10 +17,6 @@ You have multiple workspaces to do deep organization of live streams.
 
 Example: Keep an eye on Public City Cameras, or Nature Reserve Live streams, maybe that live stream of the fishes. You can also keep a track of News Live Streams if you can find one on YouTube.
 
-## Why?
-
-You know those `hACkeR` style terminals, yeah its something like that. Ever so often I stumble on random live streams, and I thought it would be pretty interesting to watch them all at once.
-
 ## Features
 
 - Order, organize, and size each tile to your hearts content.
@@ -30,6 +29,7 @@ You know those `hACkeR` style terminals, yeah its something like that. Ever so o
 - Search within currently selected workspaces by title, author, tags, description.
 - Filter tiles by Platform, Category, and Tags. Each Filter has dropdown multi select with search.
 - Move and/or Copy tiles from one workspace to another at will.
+- Supports multiple platforms, see the platform list below.
 
 ## Supported Platforms
 
@@ -38,6 +38,17 @@ You know those `hACkeR` style terminals, yeah its something like that. Ever so o
 - Kick
 - Dailymotion
 - Vimeo
+
+## Why?
+
+You know those `hACkeR` style terminals, yeah its something like that. Ever so often I stumble on random live streams, and I thought it would be pretty interesting to watch them all at once.
+
+## Road Map
+
+- Add a backend server that can communicate on behalf of the app. Allowing live streams to be saved and processed with more metadata.
+- Add a manual
+
+## Development
 
 ### Adding Platforms
 
