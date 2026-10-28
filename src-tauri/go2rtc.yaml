@@ -1,0 +1,8 @@
+streams:
+  cam_cnRzcDovLzEyNy4w:
+    - rtsp://127.0.0.1:8550/myst
+  cam_cnRzcCUzQSUyRiUy:
+    - rtsp://127.0.0.1:8550/myst
+api:
+  listen: ":1984"
+  origin: "*"

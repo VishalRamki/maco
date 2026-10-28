@@ -19,6 +19,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/youtube-api/, ""),
       },
+      "/go2rtc-api": {
+        target: "http://127.0.0.1:1984",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/go2rtc-api/, ""),
+      },
     },
     watch: {
       ignored: ["**/src-tauri/**"],

@@ -1,31 +1,67 @@
+import React from "react";
 import { registerPlatform } from "./index";
 
 function extractRtspUrl(url: string): string | null {
+  const trimmed = url.trim();
   if (
-    url.trim().toLowerCase().startsWith("rtsp://") ||
-    url.trim().toLowerCase().startsWith("rtsps://")
+    trimmed.toLowerCase().startsWith("rtsp://") ||
+    trimmed.toLowerCase().startsWith("rtsps://")
   ) {
-    return url.trim();
+    return trimmed;
   }
   return null;
+}
+
+// Safely generate a deterministic stream name without throwing errors on special characters
+function getSafeStreamName(url: string): string {
+  try {
+    const encoded = btoa(encodeURIComponent(url));
+    return "cam_" + encoded.replace(/[^a-zA-Z0-9]/g, "").slice(0, 16);
+  } catch {
+    return "cam_" + Math.random().toString(36).substring(2, 10);
+  }
 }
 
 registerPlatform("rtsp", {
   name: "RTSP Camera",
   extractId: extractRtspUrl,
 
+  // Fully isolated async metadata fetch that never throws or crashes the app
   fetchMetadata: async (url) => {
-    // RTSP streams don't support oEmbed, so we generate clean fallback metadata
+    let cameraName = "Camera Feed";
+    try {
+      const parsed = new URL(url);
+      cameraName = parsed.hostname || "Camera Feed";
+    } catch {
+      // fallback
+    }
+
+    const streamName = getSafeStreamName(url);
+
+    // Non-blocking background registration attempt
+    try {
+      await fetch(
+        `/go2rtc-api/api/streams?src=${encodeURIComponent(url)}&name=${streamName}`,
+        { method: "PUT" },
+      );
+    } catch (err) {
+      console.warn(
+        "[Maco] Background go2rtc stream registration skipped:",
+        err,
+      );
+    }
+
     return {
-      title: `RTSP Stream: ${new URL(url).hostname || "Camera Feed"}`,
-      author: "IP Camera / NVR",
+      title: `RTSP Stream: ${cameraName}`,
+      author: "Local / IP Camera",
       category: "Security / Live Feed",
-      tags: ["rtsp", "camera", "live"],
+      tags: ["rtsp", "camera", "webrtc"],
     };
   },
 
   EmbedComponent: ({ url, title }) => {
     const streamUrl = extractRtspUrl(url);
+
     if (!streamUrl) {
       return (
         <div className="flex h-full items-center justify-center text-sm text-muted-foreground p-4">
@@ -34,30 +70,19 @@ registerPlatform("rtsp", {
       );
     }
 
-    /* 
-      NOTE: Browsers do not play raw rtsp:// URLs natively. 
-      If you are using a gateway like go2rtc or rtsp-to-web, you would typically 
-      transform the streamUrl here into your WebRTC/HLS playback URL.
-      For direct integration or if your setup handles it, you can render an 
-      appropriate video player or iframe stream wrapper below:
-    */
+    const streamName = getSafeStreamName(streamUrl);
+    const gatewayPort = 1984;
+    const embedSrc = `http://127.0.0.1:${gatewayPort}/stream.html?src=${streamName}&autoplay=1&muted=1&webrtc=smooth`;
+
     return (
-      <div className="flex flex-col h-full w-full bg-black relative items-center justify-center">
-        <video
-          src={streamUrl}
-          autoPlay
-          muted
-          playsInline
-          controls
-          className="h-full w-full object-contain"
-          onError={(e) => {
-            console.warn(
-              "Direct RTSP video playback note: Browsers require an RTSP-to-WebRTC/HLS gateway (like go2rtc) to render rtsp:// streams.",
-              e,
-            );
-          }}
+      <div className="flex flex-col h-full w-full bg-black relative overflow-hidden">
+        <iframe
+          src={embedSrc}
+          title={title || "RTSP Stream"}
+          allow="autoplay; fullscreen; encrypted-media"
+          className="h-full w-full border-0"
         />
-        <div className="absolute bottom-2 left-2 bg-background/80 backdrop-blur-md px-2 py-1 rounded text-[10px] text-foreground font-mono truncate max-w-[80%] pointer-events-none">
+        <div className="absolute bottom-2 left-2 bg-background/85 backdrop-blur-md px-2 py-1 rounded text-[10px] text-foreground font-mono truncate max-w-[80%] pointer-events-none shadow-sm">
           {title || streamUrl}
         </div>
       </div>

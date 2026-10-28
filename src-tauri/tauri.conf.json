@@ -20,7 +20,7 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self' http://localtun.dev; connect-src 'self' http://127.0.0.1:1984 ws://127.0.0.1:1984 http://localhost:* ws://localhost:*; ..."
     }
   },
   "bundle": {
@@ -35,6 +35,7 @@
     ],
     "android": {
       "debugApplicationIdSuffix": ".debug"
-    }
+    },
+    "externalBin": ["binaries/go2rtc"]
   }
 }
