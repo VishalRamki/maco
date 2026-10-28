@@ -5,6 +5,7 @@ import "@/platforms/twitch";
 import "@/platforms/vimeo";
 import "@/platforms/kick";
 import "@/platforms/dailymotion";
+import "@/platforms/rtsp";
 
 function App() {
   return (
