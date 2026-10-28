@@ -68,11 +68,13 @@ checksum = "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470"
 name = "app"
 version = "0.1.0"
 dependencies = [
+ "libc",
  "log",
  "serde",
  "serde_json",
  "tauri",
  "tauri-build",
+ "tauri-kit-sidecar",
  "tauri-plugin-log",
  "tauri-plugin-shell",
 ]
@@ -3253,6 +3255,16 @@ dependencies = [
  "url",
  "uuid",
  "walkdir",
+]
+
+[[package]]
+name = "tauri-kit-sidecar"
+version = "0.30.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5b3225ba9f1e00ebb709bad545b0605ccf27e2e92b4c12c810402c4e43ba2abd"
+dependencies = [
+ "libc",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
