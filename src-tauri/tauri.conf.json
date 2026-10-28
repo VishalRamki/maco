@@ -16,11 +16,12 @@
         "width": 800,
         "height": 600,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
       }
     ],
     "security": {
-      "csp": "default-src 'self' http://localtun.dev; connect-src 'self' http://127.0.0.1:1984 ws://127.0.0.1:1984 http://localhost:* ws://localhost:*; ..."
+      "csp": "default-src 'self' http://localtun.dev; connect-src 'self' http://127.0.0.1:1984 ws://127.0.0.1:1984 http://localhost:* ws://localhost:* https://*.twitch.tv wss://*.twitch.tv https://*.youtube.com https://*.vimeo.com https://*.kick.com https://*.dailymotion.com; script-src 'self' https://embed.twitch.tv https://player.twitch.tv https://*.youtube.com https://player.vimeo.com https://*.dailymotion.com; frame-src 'self' https://embed.twitch.tv https://player.twitch.tv https://*.youtube.com https://player.vimeo.com https://player.kick.com https://*.dailymotion.com; media-src 'self' blob: https://*.youtube.com https://*.vimeo.com https://*.dailymotion.com; img-src 'self' blob: data: https://*.twitch.tv https://*.jtvnw.net https://*.youtube.com https://*.vimeo.com https://*.kick.com https://*.dailymotion.com; style-src 'self' 'unsafe-inline' https://*.youtube.com;"
     }
   },
   "bundle": {

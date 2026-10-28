@@ -1,10 +1,4 @@
-
-use std::{
-    io,
-    process::Command,
-    sync::Mutex,
-    time::Duration,
-};
+use std::{io, process::Command, sync::Mutex, time::Duration};
 
 use tauri::{Manager, RunEvent};
 use tauri_kit_sidecar::{Output, Sidecar};
@@ -14,9 +8,7 @@ use std::os::unix::process::CommandExt;
 
 struct Go2RtcState(Mutex<Option<Sidecar>>);
 
-fn go2rtc_path(
-    app: &tauri::AppHandle,
-) -> tauri::Result<std::path::PathBuf> {
+fn go2rtc_path(app: &tauri::AppHandle) -> tauri::Result<std::path::PathBuf> {
     let filename = if cfg!(target_os = "windows") {
         "go2rtc.exe"
     } else {
@@ -26,19 +18,13 @@ fn go2rtc_path(
     Ok(app.path().resource_dir()?.join(filename))
 }
 
-fn start_go2rtc(
-    app: &tauri::AppHandle,
-) -> io::Result<Sidecar> {
-    let path = go2rtc_path(app)
-        .map_err(|e| io::Error::other(e.to_string()))?;
+fn start_go2rtc(app: &tauri::AppHandle) -> io::Result<Sidecar> {
+    let path = go2rtc_path(app).map_err(|e| io::Error::other(e.to_string()))?;
 
     if !path.is_file() {
         return Err(io::Error::new(
             io::ErrorKind::NotFound,
-            format!(
-                "go2rtc executable not found: {}",
-                path.display()
-            ),
+            format!("go2rtc executable not found: {}", path.display()),
         ));
     }
 
@@ -58,11 +44,7 @@ fn start_go2rtc(
                 // Install the signal before checking the parent.
                 // This ordering closes the parent-exits-before-setup
                 // race.
-                if libc::prctl(
-                    libc::PR_SET_PDEATHSIG,
-                    libc::SIGKILL,
-                ) != 0
-                {
+                if libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL) != 0 {
                     return Err(io::Error::last_os_error());
                 }
 
@@ -88,11 +70,7 @@ fn start_go2rtc(
 
 fn stop_go2rtc(app: &tauri::AppHandle) {
     let sidecar = match app.try_state::<Go2RtcState>() {
-        Some(state) => state
-            .0
-            .lock()
-            .ok()
-            .and_then(|mut guard| guard.take()),
+        Some(state) => state.0.lock().ok().and_then(|mut guard| guard.take()),
         None => None,
     };
 
@@ -109,14 +87,13 @@ fn stop_go2rtc(app: &tauri::AppHandle) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // Initialize the localhost plugin with a designated port (e.g., 1430)
+        .plugin(tauri_plugin_localhost::Builder::new(1430).build())
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             let sidecar = start_go2rtc(app.handle())?;
 
-            println!(
-                "[Tauri] go2rtc started with PID {}",
-                sidecar.id()
-            );
+            println!("[Tauri] go2rtc started with PID {}", sidecar.id());
 
             app.manage(Go2RtcState(Mutex::new(Some(sidecar))));
 

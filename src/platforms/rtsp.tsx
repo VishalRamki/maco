@@ -1,4 +1,3 @@
-import React from "react";
 import { registerPlatform } from "./index";
 
 function extractRtspUrl(url: string): string | null {

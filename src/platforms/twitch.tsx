@@ -7,9 +7,17 @@ function extractTwitchInfo(url: string): string | null {
     url.match(/twitch\.tv\/[a-zA-Z0-9_]+\/clip\/([a-zA-Z0-9_-]+)/);
   const channelMatch = url.match(/twitch\.tv\/([a-zA-Z0-9_]+)/);
 
-  if (videoMatch || clipMatch || channelMatch) {
-    return channelMatch?.[1] || videoMatch?.[1] || clipMatch?.[1] || null;
+  if (videoMatch?.[1]) return videoMatch[1];
+  if (clipMatch?.[1]) return clipMatch[1];
+
+  if (
+    channelMatch?.[1] &&
+    channelMatch[1] !== "videos" &&
+    channelMatch[1] !== "clips"
+  ) {
+    return channelMatch[1];
   }
+
   return null;
 }
 
@@ -42,28 +50,38 @@ registerPlatform("twitch", {
     };
   },
   EmbedComponent: ({ url, title }) => {
+    // This will now cleanly evaluate to "localhost" in both dev and production builds
     const parentDomain = window.location.hostname || "localhost";
+
     const videoMatch = url.match(/twitch\.tv\/videos\/([0-9]+)/);
-    const clipMatch = url.match(/clips\.twitch\.tv\/([a-zA-Z0-9_-]+)/);
+    const clipMatch =
+      url.match(/clips\.twitch\.tv\/([a-zA-Z0-9_-]+)/) ||
+      url.match(/twitch\.tv\/[a-zA-Z0-9_]+\/clip\/([a-zA-Z0-9_-]+)/);
     const channelMatch = url.match(/twitch\.tv\/([a-zA-Z0-9_]+)/);
 
     let embedSrc = "";
     if (videoMatch) {
-      embedSrc = `https://player.twitch.tv/?video=${videoMatch[1]}&parent=${parentDomain}&muted=true`;
+      embedSrc = `https://player.twitch.tv/?video=${videoMatch[1]}&parent=${parentDomain}&muted=true&popout=true`;
     } else if (clipMatch) {
-      embedSrc = `https://clips.twitch.tv/embed?clip=${clipMatch[1]}&parent=${parentDomain}&muted=true`;
+      embedSrc = `https://clips.twitch.tv/embed?clip=${clipMatch[1]}&parent=${parentDomain}&muted=true&popout=true`;
     } else if (channelMatch) {
-      embedSrc = `https://player.twitch.tv/?channel=${channelMatch[1]}&parent=${parentDomain}&muted=true`;
+      const channelName = channelMatch[1];
+      if (channelName !== "videos" && channelName !== "clips") {
+        embedSrc = `https://player.twitch.tv/?channel=${channelName}&parent=${parentDomain}&muted=true&popout=true`;
+      }
     }
 
     return (
-      <iframe
-        src={embedSrc}
-        title={title || "Twitch Stream"}
-        allow="autoplay; encrypted-media"
-        allowFullScreen
-        className="h-full w-full border-0"
-      />
+      <div className="w-full h-[450px] min-h-[350px]">
+        <iframe
+          src={embedSrc}
+          title={title || "Twitch Stream"}
+          sandbox="allow-scripts allow-same-origin allow-popups allow-modals"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowFullScreen
+          className="w-full h-full border-0"
+        />
+      </div>
     );
   },
 });

@@ -26,6 +26,7 @@ tauri = { version = "2.12.5", features = [] }
 tauri-plugin-log = "2"
 tauri-plugin-shell = "2"
 tauri-kit-sidecar = "0.30.0"
+tauri-plugin-localhost = "2"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 libc = "0.2"

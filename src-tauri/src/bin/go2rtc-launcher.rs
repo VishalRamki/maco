@@ -20,8 +20,7 @@ fn main() {
         }
     }
 
-    let executable = std::env::var_os("GO2RTC_EXECUTABLE")
-        .expect("GO2RTC_EXECUTABLE is required");
+    let executable = std::env::var_os("GO2RTC_EXECUTABLE").expect("GO2RTC_EXECUTABLE is required");
 
     let error = Command::new(executable)
         .args(std::env::args_os().skip(1))
