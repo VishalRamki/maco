@@ -4,6 +4,7 @@
 
 - Added support for RTSP Streams
 - Added `go2rtc` backing for RTSP streams
+- Added ability to delete either from the workspace or from the entire app.
 
 ## Fixed / Changed
 

@@ -44,6 +44,9 @@ export function TileGrid() {
   const workspaces = useUrlStore((state) => state.workspaces);
   const activeWorkspaceId = useUrlStore((state) => state.activeWorkspaceId);
   const removeUrl = useUrlStore((state) => state.removeUrl);
+  const removeTileFromWorkspace = useUrlStore(
+    (state) => state.removeTileFromWorkspace,
+  );
   const updateLayouts = useUrlStore((state) => state.updateLayouts);
   const copyTileToWorkspace = useUrlStore((state) => state.copyTileToWorkspace);
   const moveTileToWorkspace = useUrlStore((state) => state.moveTileToWorkspace);
@@ -148,13 +151,24 @@ export function TileGrid() {
 
   const maximizedItem = activeUrls.find((item) => item.id === maximizedId);
 
-  const handleDeleteConfirmed = () => {
+  const handleRemoveFromWorkspace = () => {
+    if (!tileToDelete) return;
+    removeTileFromWorkspace(tileToDelete.id, activeWorkspaceId);
+    if (tileToDelete.isMaximized) {
+      setMaximizedId(null);
+    }
+    setTileToDelete(null);
+    toast.success("Removed tile from workspace");
+  };
+
+  const handleDeleteCompletely = () => {
     if (!tileToDelete) return;
     removeUrl(tileToDelete.id);
     if (tileToDelete.isMaximized) {
       setMaximizedId(null);
     }
     setTileToDelete(null);
+    toast.success("Deleted tile completely");
   };
 
   return (
@@ -355,26 +369,38 @@ export function TileGrid() {
         open={!!tileToDelete}
         onOpenChange={(open) => !open && setTileToDelete(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Are you sure you want to delete this tile?
-            </AlertDialogTitle>
+            <AlertDialogTitle>Delete Tile</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove the tile{" "}
+              How would you like to remove{" "}
               <span className="font-semibold text-foreground">
                 &quot;{tileToDelete?.titleOrUrl}&quot;
-              </span>{" "}
-              from this workspace.
+              </span>
+              ?
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="flex-col-reverse sm:flex-col gap-2 mt-4">
+            <AlertDialogCancel className="w-full mt-0 sm:mt-0">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDeleteConfirmed}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                handleRemoveFromWorkspace();
+              }}
+              className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/80 cursor-pointer m-0"
             >
-              Delete
+              Remove from Workspace Only
+            </AlertDialogAction>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDeleteCompletely();
+              }}
+              className="w-full bg-destructive text-destructive-foreground hover:bg-destructive/90 cursor-pointer m-0"
+            >
+              Delete Completely
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

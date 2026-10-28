@@ -60,6 +60,7 @@ interface UrlStore {
   // Tile & Layout actions
   addUrl: (item: Omit<UrlItem, "id">, targetWorkspaceId?: string) => void;
   removeUrl: (id: number) => void;
+  removeTileFromWorkspace: (tileId: number, workspaceId: string) => void;
   updateLayouts: (layout: any) => void;
   resetLayout: () => void;
 
@@ -219,28 +220,33 @@ export const useUrlStore = create<UrlStore>()(
           };
         }),
 
-      removeUrl: (id) =>
+      removeTileFromWorkspace: (tileId, workspaceId) =>
         set((state) => {
-          // Remove from current active workspace items list
           const updatedWorkspaces = state.workspaces.map((ws) => {
-            if (ws.id === state.activeWorkspaceId) {
+            if (ws.id === workspaceId) {
               return {
                 ...ws,
-                items: ws.items.filter((item) => item.id !== id),
+                items: ws.items.filter((item) => item.id !== tileId),
               };
             }
             return ws;
           });
 
-          // Clean up tile from global library if no workspace references it anymore
-          const isReferencedElsewhere = updatedWorkspaces.some((ws) =>
-            ws.items.some((item) => item.id === id),
-          );
+          return {
+            workspaces: updatedWorkspaces,
+          };
+        }),
+
+      // Completely deletes the tile from global tiles and ALL workspaces
+      removeUrl: (id) =>
+        set((state) => {
+          const updatedWorkspaces = state.workspaces.map((ws) => ({
+            ...ws,
+            items: ws.items.filter((item) => item.id !== id),
+          }));
 
           const newTiles = { ...state.tiles };
-          if (!isReferencedElsewhere) {
-            delete newTiles[id];
-          }
+          delete newTiles[id];
 
           return {
             tiles: newTiles,
