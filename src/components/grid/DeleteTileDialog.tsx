@@ -5,10 +5,8 @@
 
 import {
   AlertDialog,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
@@ -56,10 +54,10 @@ export function DeleteTileDialog({
         if (!open) onClose();
       }}
     >
-      <AlertDialogContent>
+      <AlertDialogContent className="w-[90vw] max-w-md p-6">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Tile</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle className="text-xl">Delete Tile</AlertDialogTitle>
+          <AlertDialogDescription className="text-sm sm:text-base mt-2">
             Are you sure you want to delete &quot;{tileToDelete?.titleOrUrl}
             &quot;?
             <br />
@@ -68,25 +66,31 @@ export function DeleteTileDialog({
             from all workspaces.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-          <AlertDialogCancel onClick={onClose} className="cursor-pointer">
-            Cancel
-          </AlertDialogCancel>
+
+        {/* Custom vertical button stack to prevent overflow */}
+        <div className="flex flex-col gap-2.5 mt-6">
+          <Button
+            variant="destructive"
+            onClick={onDeleteCompletely}
+            className="w-full cursor-pointer"
+          >
+            Delete Completely
+          </Button>
           <Button
             variant="outline"
             onClick={onRemoveFromWorkspace}
-            className="cursor-pointer"
+            className="w-full cursor-pointer"
           >
             Remove from Workspace
           </Button>
           <Button
-            variant="destructive"
-            onClick={onDeleteCompletely}
-            className="cursor-pointer"
+            variant="ghost"
+            onClick={onClose}
+            className="w-full cursor-pointer"
           >
-            Delete Completely
+            Cancel
           </Button>
-        </AlertDialogFooter>
+        </div>
       </AlertDialogContent>
     </AlertDialog>
   );
