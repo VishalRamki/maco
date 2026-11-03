@@ -11,6 +11,8 @@ import {
   Settings,
   RotateCcw,
   Library,
+  SlidersHorizontal,
+  Trash2,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -34,6 +36,10 @@ export interface AppMenuProps {
   onAddExistingTile: () => void;
   /** Callback triggered when user requests layout reset confirmation. */
   onResetLayout: () => void;
+  /** Callback triggered when user wants to change the app mode. */
+  onChangeMode: () => void;
+  /** Callback triggered when user requests factory reset confirmation. */
+  onFactoryReset: () => void;
 }
 
 /**
@@ -43,6 +49,8 @@ export function AppMenu({
   onNewTile,
   onAddExistingTile,
   onResetLayout,
+  onChangeMode,
+  onFactoryReset,
 }: AppMenuProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -137,6 +145,18 @@ export function AppMenu({
               className="gap-2 text-xs cursor-pointer"
             >
               <Settings className="size-3.5" /> Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={onChangeMode}
+              className="gap-2 text-xs cursor-pointer"
+            >
+              <SlidersHorizontal className="size-3.5" /> Change Mode
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={onFactoryReset}
+              className="gap-2 text-xs cursor-pointer text-destructive"
+            >
+              <Trash2 className="size-3.5" /> Factory Reset
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>

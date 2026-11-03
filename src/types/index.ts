@@ -7,3 +7,4 @@ export * from "./tile";
 export * from "./workspace";
 export * from "./platform";
 export * from "./settings";
+export * from "./mode";

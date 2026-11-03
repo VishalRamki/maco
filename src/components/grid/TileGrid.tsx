@@ -4,6 +4,7 @@
  */
 
 import { useState } from "react";
+import { AlertTriangle } from "lucide-react";
 import ReactGridLayout, { WidthProvider } from "react-grid-layout/legacy";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -13,6 +14,7 @@ import { MaximizedTileModal } from "./MaximizedTileModal";
 import { DeleteTileDialog, type TileToDeleteInfo } from "./DeleteTileDialog";
 import { TileGridEmptyState } from "./TileGridEmptyState";
 import { useUrlStore } from "@/store/useUrlStore";
+import { useModeStore } from "@/store/useModeStore";
 import { useFilteredTiles } from "@/hooks/useFilteredTiles";
 import { toast } from "sonner";
 import type { GridLayoutItem } from "@/types";
@@ -33,6 +35,10 @@ export function TileGrid() {
   const copyTileToWorkspace = useUrlStore((state) => state.copyTileToWorkspace);
   const moveTileToWorkspace = useUrlStore((state) => state.moveTileToWorkspace);
   const resetFilters = useUrlStore((state) => state.resetFilters);
+
+  const mode = useModeStore((state) => state.mode);
+  const connectionStatus = useModeStore((state) => state.connectionStatus);
+  const isServerDisconnected = mode === "server" && connectionStatus === "disconnected";
 
   const { allWorkspaceTiles, filteredTiles, totalCount, filteredCount } =
     useFilteredTiles();
@@ -58,6 +64,10 @@ export function TileGrid() {
   }));
 
   const handleLayoutChange = (newLayout: readonly GridLayoutItem[]) => {
+    if (isServerDisconnected) {
+      toast.error("Cannot save layout: server is unreachable");
+      return;
+    }
     updateLayouts(newLayout);
   };
 
@@ -104,6 +114,16 @@ export function TileGrid() {
 
   return (
     <main className="w-full min-h-137.5 flex-1 bg-muted/30 p-4 relative overflow-y-auto">
+      {/* Server Disconnected Warning Banner */}
+      {isServerDisconnected && (
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+          <AlertTriangle className="size-4 shrink-0" />
+          <span>
+            Server is unreachable. Changes cannot be synced until the connection is restored.
+          </span>
+        </div>
+      )}
+
       {/* Fullscreen Maximized Modal */}
       <MaximizedTileModal
         tile={maximizedItem}
@@ -133,8 +153,8 @@ export function TileGrid() {
           rowHeight={60}
           draggableHandle=".drag-handle"
           onLayoutChange={handleLayoutChange}
-          isResizable={true}
-          isDraggable={true}
+          isResizable={!isServerDisconnected}
+          isDraggable={!isServerDisconnected}
         >
           {filteredTiles.map((item) => (
             <TileCard
