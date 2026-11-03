@@ -41,6 +41,7 @@ export const TileCard = React.forwardRef<HTMLDivElement, TileCardProps>(
       onMoveTile,
       className,
       style,
+      children,
       ...rest
     },
     ref,
@@ -70,6 +71,7 @@ export const TileCard = React.forwardRef<HTMLDivElement, TileCardProps>(
             title={tile.title}
           />
         </div>
+        {children}
       </div>
     );
   },
