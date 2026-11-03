@@ -10,8 +10,10 @@ import {
   LayoutGrid,
   Pencil,
   Library,
+  Minus,
+  Square,
 } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,6 +50,51 @@ export function Toolbar() {
   const [newWorkspaceName, setNewWorkspaceName] = useState("");
   const [editWorkspaceName, setEditWorkspaceName] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Tauri window controls state
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [isTauri, setIsTauri] = useState(false);
+
+  // Check if running in Tauri and get window reference
+  useEffect(() => {
+    if (typeof window !== "undefined" && (window as any).__TAURI__) {
+      setIsTauri(true);
+      import("@tauri-apps/api/window").then(({ getCurrentWindow }) => {
+        const win = getCurrentWindow();
+        win.isMaximized().then((maximized: boolean) => {
+          setIsMaximized(maximized);
+        });
+      });
+    }
+  }, []);
+
+  const handleMinimize = () => {
+    if (!isTauri) return;
+    import("@tauri-apps/api/window").then(({ getCurrentWindow }) => {
+      getCurrentWindow().minimize();
+    });
+  };
+
+  const handleMaximize = () => {
+    if (!isTauri) return;
+    import("@tauri-apps/api/window").then(({ getCurrentWindow }) => {
+      const win = getCurrentWindow();
+      if (isMaximized) {
+        win.unmaximize();
+      } else {
+        win.maximize();
+      }
+      const newMaximized = !isMaximized;
+      setIsMaximized(newMaximized);
+    });
+  };
+
+  const handleClose = () => {
+    if (!isTauri) return;
+    import("@tauri-apps/api/window").then(({ getCurrentWindow }) => {
+      getCurrentWindow().close();
+    });
+  };
 
   const tiles = useUrlStore((state) => state.tiles);
   const workspaces = useUrlStore((state) => state.workspaces);
@@ -157,9 +204,9 @@ export function Toolbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-background app-drag">
         <div className="flex h-14 items-center justify-between px-4 gap-4">
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-3 shrink-0 app-no-drag">
             <DropdownMenu>
               <DropdownMenuTrigger className="cursor-pointer">
                 <img
@@ -267,7 +314,7 @@ export function Toolbar() {
           </div>
 
           {/* Search & Filters */}
-          <div className="flex items-center gap-2 flex-1 max-w-2xl mx-auto">
+          <div className="flex items-center gap-2 flex-1 max-w-2xl mx-auto app-no-drag">
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
               <input
@@ -320,6 +367,31 @@ export function Toolbar() {
                 Clear
               </button>
             )}
+          </div>
+
+          {/* Window controls */}
+          <div className="flex items-center gap-1 shrink-0 app-no-drag">
+            <button
+              onClick={handleMinimize}
+              className="group flex items-center justify-center w-10 h-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted active:bg-muted/80 transition-colors cursor-pointer"
+              title="Minimize"
+            >
+              <Minus className="size-3.5 group-hover:scale-110 transition-transform" />
+            </button>
+            <button
+              onClick={handleMaximize}
+              className="group flex items-center justify-center w-10 h-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted active:bg-muted/80 transition-colors cursor-pointer"
+              title={isMaximized ? "Restore" : "Maximize"}
+            >
+              <Square className="size-3.5 group-hover:scale-110 transition-transform" />
+            </button>
+            <button
+              onClick={handleClose}
+              className="group flex items-center justify-center w-10 h-8 rounded-md text-muted-foreground hover:text-destructive-foreground hover:bg-destructive active:bg-destructive/90 transition-colors cursor-pointer"
+              title="Close"
+            >
+              <X className="size-3.5 group-hover:scale-110 transition-transform" />
+            </button>
           </div>
 
           <input
