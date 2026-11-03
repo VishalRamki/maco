@@ -1,40 +1,47 @@
-export interface PlatformDefinition {
-  name: string;
-  // Extracts unique ID or slug from a URL
-  extractId: (url: string) => string | null;
-  // Fetches metadata (title, author, thumbnail, etc.)
-  fetchMetadata: (
-    url: string,
-    id: string,
-    youtubeApiKey?: string,
-  ) => Promise<{
-    title?: string;
-    author?: string;
-    thumbnailUrl?: string;
-    category?: string;
-    tags?: string[];
-  }>;
-  // Renders the embed iframe
-  EmbedComponent: ({
-    url,
-    title,
-  }: {
-    url: string;
-    title?: string;
-  }) => React.ReactNode;
-}
+/**
+ * @file index.ts
+ * @description Central registry and detection engine for supported video and streaming platforms.
+ */
 
-// Registry dictionary
+import type {
+  PlatformDefinition,
+  PlatformMetadata,
+  PlatformEmbedProps,
+  PlatformDetectionResult,
+} from "@/types";
+
+export type {
+  PlatformDefinition,
+  PlatformMetadata,
+  PlatformEmbedProps,
+  PlatformDetectionResult,
+};
+
+/**
+ * Global registry dictionary mapping platform keys (e.g. 'youtube', 'twitch') to platform adapters.
+ */
 export const platforms: Record<string, PlatformDefinition> = {};
 
-export function registerPlatform(key: string, definition: PlatformDefinition) {
+/**
+ * Registers a new platform definition module in the runtime platform registry.
+ *
+ * @param key - Unique lowercase identifier key for the platform (e.g., 'youtube').
+ * @param definition - Complete platform definition contract implementation.
+ */
+export function registerPlatform(
+  key: string,
+  definition: PlatformDefinition,
+): void {
   platforms[key] = definition;
 }
 
-// Detect which platform a URL belongs to
-export function detectPlatform(
-  url: string,
-): { platformKey: string; id: string } | null {
+/**
+ * Detects which registered platform a given content URL belongs to by testing extractors.
+ *
+ * @param url - The input URL to evaluate against all registered platform extractors.
+ * @returns {PlatformDetectionResult | null} The matched platform key and content ID, or null if unsupported.
+ */
+export function detectPlatform(url: string): PlatformDetectionResult | null {
   for (const [key, def] of Object.entries(platforms)) {
     const id = def.extractId(url);
     if (id) {

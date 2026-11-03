@@ -1,4 +1,10 @@
+/**
+ * @file AddExistingTileDialog.tsx
+ * @description Dialog modal allowing users to browse and add tiles from their global library to the active workspace.
+ */
+
 import { useState } from "react";
+import { Search, Plus, Check } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,14 +15,21 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useUrlStore } from "@/store/useUrlStore";
-import { Search, Plus, Check } from "lucide-react";
 import { toast } from "sonner";
 
-interface AddExistingTileDialogProps {
+/**
+ * Prop interface for `AddExistingTileDialog`.
+ */
+export interface AddExistingTileDialogProps {
+  /** Controlled open state of the dialog. */
   open: boolean;
+  /** State updater callback for the dialog. */
   onOpenChange: (open: boolean) => void;
 }
 
+/**
+ * Modal dialog for searching and picking existing tiles from the deduplicated library.
+ */
 export function AddExistingTileDialog({
   open,
   onOpenChange,
@@ -74,6 +87,7 @@ export function AddExistingTileDialog({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full h-9 pl-8 pr-3 text-xs rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+              aria-label="Search existing library tiles"
             />
           </div>
         </div>

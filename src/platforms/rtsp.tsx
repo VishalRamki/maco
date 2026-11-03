@@ -1,6 +1,18 @@
-import { registerPlatform } from "./index";
+/**
+ * @file rtsp.tsx
+ * @description RTSP and IP Camera platform adapter supporting stream normalization and go2rtc WebRTC gateway playback.
+ */
 
-function extractRtspUrl(url: string): string | null {
+import { registerPlatform } from "./index";
+import type { PlatformMetadata } from "@/types";
+
+/**
+ * Extracts and validates an RTSP or RTSPS stream URL.
+ *
+ * @param url - Input URL to test for RTSP/RTSPS protocol prefixes.
+ * @returns {string | null} Normalized RTSP URL string, or null if invalid.
+ */
+export function extractRtspUrl(url: string): string | null {
   const trimmed = url.trim();
   if (
     trimmed.toLowerCase().startsWith("rtsp://") ||
@@ -11,8 +23,13 @@ function extractRtspUrl(url: string): string | null {
   return null;
 }
 
-// Safely generate a deterministic stream name without throwing errors on special characters
-function getSafeStreamName(url: string): string {
+/**
+ * Safely generates a deterministic stream identifier without throwing on special characters.
+ *
+ * @param url - Source RTSP URL.
+ * @returns {string} Safe stream key identifier.
+ */
+export function getSafeStreamName(url: string): string {
   try {
     const encoded = btoa(encodeURIComponent(url));
     return "cam_" + encoded.replace(/[^a-zA-Z0-9]/g, "").slice(0, 16);
@@ -26,18 +43,18 @@ registerPlatform("rtsp", {
   extractId: extractRtspUrl,
 
   // Fully isolated async metadata fetch that never throws or crashes the app
-  fetchMetadata: async (url) => {
+  fetchMetadata: async (url): Promise<PlatformMetadata> => {
     let cameraName = "Camera Feed";
     try {
       const parsed = new URL(url);
       cameraName = parsed.hostname || "Camera Feed";
     } catch {
-      // fallback
+      // Fallback
     }
 
     const streamName = getSafeStreamName(url);
 
-    // Non-blocking background registration attempt
+    // Non-blocking background registration attempt with local go2rtc server
     try {
       await fetch(
         `/go2rtc-api/api/streams?src=${encodeURIComponent(url)}&name=${streamName}`,

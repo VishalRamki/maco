@@ -1,33 +1,47 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import type { UrlItem, WorkspaceItem, Workspace, GridLayoutItem } from "@/types";
+import { useModeStore } from "./useModeStore";
+import { syncData, fetchAllData } from "@/lib/api";
 
-export interface UrlItem {
-  id: number;
-  url: string;
-  platform: string;
-  title?: string;
-  author?: string;
-  description?: string;
-  thumbnailUrl?: string;
-  category?: string;
-  tags?: string[];
-  duration?: string;
-  viewCount?: string;
-  publishedAt?: string;
+export type { UrlItem, WorkspaceItem, Workspace };
+
+/**
+ * Sync current store state to the server if in server mode.
+ * Runs asynchronously without blocking the UI.
+ */
+function syncToServerIfEnabled() {
+  const mode = useModeStore.getState().mode;
+  if (mode !== "server") return;
+
+  const state = useUrlStore.getState();
+  syncData({
+    tiles: state.tiles,
+    workspaces: state.workspaces,
+    activeWorkspaceId: state.activeWorkspaceId,
+  }).catch((err) => {
+    console.error("Failed to sync to server:", err);
+  });
 }
 
-export interface WorkspaceItem {
-  id: number; // references UrlItem id
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
+/**
+ * Load data from the server if in server mode.
+ * Returns a promise that resolves when data is loaded.
+ */
+export async function loadFromServerIfEnabled(): Promise<void> {
+  const mode = useModeStore.getState().mode;
+  if (mode !== "server") return;
 
-export interface Workspace {
-  id: string;
-  name: string;
-  items: WorkspaceItem[];
+  const data = await fetchAllData();
+  if (data) {
+    useUrlStore.setState({
+      tiles: data.tiles,
+      workspaces: data.workspaces.length > 0
+        ? data.workspaces
+        : [{ id: "default", name: "Default Workspace", items: [] }],
+      activeWorkspaceId: data.activeWorkspaceId,
+    });
+  }
 }
 
 interface UrlStore {
@@ -61,7 +75,7 @@ interface UrlStore {
   addUrl: (item: Omit<UrlItem, "id">, targetWorkspaceId?: string) => void;
   removeUrl: (id: number) => void;
   removeTileFromWorkspace: (tileId: number, workspaceId: string) => void;
-  updateLayouts: (layout: any) => void;
+  updateLayouts: (layout: readonly GridLayoutItem[] | GridLayoutItem[]) => void;
   resetLayout: () => void;
 
   // Import / Export
@@ -101,7 +115,10 @@ export const useUrlStore = create<UrlStore>()(
           selectedTags: [],
         }),
 
-      setActiveWorkspace: (activeWorkspaceId) => set({ activeWorkspaceId }),
+      setActiveWorkspace: (activeWorkspaceId) => {
+        set({ activeWorkspaceId });
+        syncToServerIfEnabled();
+      },
 
       createWorkspace: (name) => {
         const newId = `ws-${Date.now()}`;
@@ -109,16 +126,19 @@ export const useUrlStore = create<UrlStore>()(
           workspaces: [...state.workspaces, { id: newId, name, items: [] }],
           activeWorkspaceId: newId,
         }));
+        syncToServerIfEnabled();
       },
 
-      renameWorkspace: (id, name) =>
+      renameWorkspace: (id, name) => {
         set((state) => ({
           workspaces: state.workspaces.map((ws) =>
             ws.id === id ? { ...ws, name } : ws,
           ),
-        })),
+        }));
+        syncToServerIfEnabled();
+      },
 
-      deleteWorkspace: (id) =>
+      deleteWorkspace: (id) => {
         set((state) => {
           if (state.workspaces.length <= 1) return state; // Keep at least one workspace
           const remaining = state.workspaces.filter((ws) => ws.id !== id);
@@ -130,9 +150,11 @@ export const useUrlStore = create<UrlStore>()(
             workspaces: remaining,
             activeWorkspaceId: newActiveId,
           };
-        }),
+        });
+        syncToServerIfEnabled();
+      },
 
-      copyTileToWorkspace: (tileId, targetWorkspaceId) =>
+      copyTileToWorkspace: (tileId, targetWorkspaceId) => {
         set((state) => {
           const updatedWorkspaces = state.workspaces.map((ws) => {
             if (ws.id === targetWorkspaceId) {
@@ -152,9 +174,11 @@ export const useUrlStore = create<UrlStore>()(
           });
 
           return { workspaces: updatedWorkspaces };
-        }),
+        });
+        syncToServerIfEnabled();
+      },
 
-      moveTileToWorkspace: (tileId, targetWorkspaceId) =>
+      moveTileToWorkspace: (tileId, targetWorkspaceId) => {
         set((state) => {
           const currentWsId = state.activeWorkspaceId;
           if (currentWsId === targetWorkspaceId) return state;
@@ -184,9 +208,11 @@ export const useUrlStore = create<UrlStore>()(
           });
 
           return { workspaces: updatedWorkspaces };
-        }),
+        });
+        syncToServerIfEnabled();
+      },
 
-      addUrl: (item, targetWorkspaceId) =>
+      addUrl: (item, targetWorkspaceId) => {
         set((state) => {
           const newId = Date.now();
           const newItem: UrlItem = {
@@ -218,9 +244,11 @@ export const useUrlStore = create<UrlStore>()(
             tiles: { ...state.tiles, [newId]: newItem },
             workspaces: updatedWorkspaces,
           };
-        }),
+        });
+        syncToServerIfEnabled();
+      },
 
-      removeTileFromWorkspace: (tileId, workspaceId) =>
+      removeTileFromWorkspace: (tileId, workspaceId) => {
         set((state) => {
           const updatedWorkspaces = state.workspaces.map((ws) => {
             if (ws.id === workspaceId) {
@@ -235,10 +263,12 @@ export const useUrlStore = create<UrlStore>()(
           return {
             workspaces: updatedWorkspaces,
           };
-        }),
+        });
+        syncToServerIfEnabled();
+      },
 
       // Completely deletes the tile from global tiles and ALL workspaces
-      removeUrl: (id) =>
+      removeUrl: (id) => {
         set((state) => {
           const updatedWorkspaces = state.workspaces.map((ws) => ({
             ...ws,
@@ -252,15 +282,17 @@ export const useUrlStore = create<UrlStore>()(
             tiles: newTiles,
             workspaces: updatedWorkspaces,
           };
-        }),
+        });
+        syncToServerIfEnabled();
+      },
 
-      updateLayouts: (layout) =>
+      updateLayouts: (layout) => {
         set((state) => {
           const updatedWorkspaces = state.workspaces.map((ws) => {
             if (ws.id === state.activeWorkspaceId) {
               const updatedItems = ws.items.map((item) => {
-                const itemLayout = (layout as any[]).find(
-                  (l: any) => l.i === item.id.toString(),
+                const itemLayout = layout.find(
+                  (l) => l.i === item.id.toString(),
                 );
                 if (itemLayout) {
                   return {
@@ -279,9 +311,11 @@ export const useUrlStore = create<UrlStore>()(
           });
 
           return { workspaces: updatedWorkspaces };
-        }),
+        });
+        syncToServerIfEnabled();
+      },
 
-      resetLayout: () =>
+      resetLayout: () => {
         set((state) => {
           const updatedWorkspaces = state.workspaces.map((ws) => {
             if (ws.id === state.activeWorkspaceId) {
@@ -297,7 +331,9 @@ export const useUrlStore = create<UrlStore>()(
             return ws;
           });
           return { workspaces: updatedWorkspaces };
-        }),
+        });
+        syncToServerIfEnabled();
+      },
 
       exportToJson: () =>
         JSON.stringify(
@@ -320,6 +356,7 @@ export const useUrlStore = create<UrlStore>()(
                 workspaces: parsed.workspaces,
                 activeWorkspaceId: parsed.workspaces[0]?.id || "default",
               });
+              syncToServerIfEnabled();
               return true;
             }
           }
@@ -341,6 +378,7 @@ export const useUrlStore = create<UrlStore>()(
               workspaces: [{ id: "default", name: "Default Workspace", items }],
               activeWorkspaceId: "default",
             });
+            syncToServerIfEnabled();
             return true;
           }
           return false;

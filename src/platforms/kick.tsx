@@ -1,6 +1,18 @@
-import { registerPlatform } from "./index";
+/**
+ * @file kick.tsx
+ * @description Kick platform adapter for channel livestream embedding and metadata.
+ */
 
-function extractKickChannel(url: string): string | null {
+import { registerPlatform } from "./index";
+import type { PlatformMetadata } from "@/types";
+
+/**
+ * Extracts the channel username from a Kick URL.
+ *
+ * @param url - Kick stream URL (e.g. `https://kick.com/channelname`).
+ * @returns {string | null} Channel identifier, or null if not matched.
+ */
+export function extractKickChannel(url: string): string | null {
   const match = url.match(/(?:kick\.com\/)([a-zA-Z0-9_]+)/);
   return match ? match[1] : null;
 }
@@ -8,7 +20,7 @@ function extractKickChannel(url: string): string | null {
 registerPlatform("kick", {
   name: "Kick",
   extractId: extractKickChannel,
-  fetchMetadata: async (_url, channel) => {
+  fetchMetadata: async (_url, channel): Promise<PlatformMetadata> => {
     return {
       title: `Kick Stream: ${channel}`,
       author: channel,
