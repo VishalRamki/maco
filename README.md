@@ -2,7 +2,7 @@
 <img src="src/assets/maco_brand_asset.png" alt="Maco" width="200">
 </p>
 <p align="center">
-<img src="repo-assets/windows-desktop-screenshot-1.jpg" alt="Maco Desktop Screenshot" height="375">
+<img src="repo-assets/windows-desktop-screenshot-2.jpg" alt="Maco Desktop Screenshot" height="375">
 </p>
 
 # Maco
@@ -25,11 +25,14 @@ Example: Keep an eye on Public City Cameras, or Nature Reserve Live streams, may
 - Maximize a title to view it more closer with the Arrow expand icon in each tile.
 - Divide up your live streams by workspaces. Add infinite number of workspaces.
 - Add any Tile to any number of workspaces
-- Export and Import workspaces and all tile information via the Hamburger menu at the top right.
+- Export and Import workspaces and all tile information via the Maco Button at the top left.
 - Search within currently selected workspaces by title, author, tags, description.
 - Filter tiles by Platform, Category, and Tags. Each Filter has dropdown multi select with search.
 - Move and/or Copy tiles from one workspace to another at will.
 - Supports multiple platforms, see the platform list below.
+- Added Support for RTSP streams via `go2rtc`
+- Updated system to use a local client mode where all data is saved and managed locally, with the option to point to a server for having the server manage livestreams.
+- [WIP] Added inital support for connecting to a server (For more advanced NVR style features)
 
 ## Supported Platforms
 
@@ -38,6 +41,7 @@ Example: Keep an eye on Public City Cameras, or Nature Reserve Live streams, may
 - Kick
 - Dailymotion
 - Vimeo
+- RTSP
 
 ## Why?
 
@@ -45,8 +49,8 @@ You know those `hACkeR` style terminals, yeah its something like that. Ever so o
 
 ## Road Map
 
-- Add a backend server that can communicate on behalf of the app. Allowing live streams to be saved and processed with more metadata.
-- Add a manual
+- [WIP] Add a backend server that can communicate on behalf of the app. Allowing live streams to be saved and processed with more metadata.
+- [WIP] Add a manual
 
 ## Development
 
