@@ -10,7 +10,6 @@ import { FilterBar } from "./FilterBar";
 import { WindowControls } from "./WindowControls";
 import { WorkspaceDialogs } from "./WorkspaceDialogs";
 import { ResetLayoutDialog } from "./ResetLayoutDialog";
-import { FactoryResetDialog } from "./FactoryResetDialog";
 import { AddUrlDialog } from "@/components/AddUrlDialog";
 import { AddExistingTileDialog } from "@/components/AddExistingTileDialog";
 import { SettingsDialog } from "@/components/SettingsDialog";
@@ -37,13 +36,18 @@ export function Toolbar({ onOpenSetupWizard, onFactoryReset }: ToolbarProps) {
   const [newWorkspaceModalOpen, setNewWorkspaceModalOpen] = useState(false);
   const [editWorkspaceModalOpen, setEditWorkspaceModalOpen] = useState(false);
   const [setupWizardOpen, setSetupWizardOpen] = useState(false);
-  const [factoryResetOpen, setFactoryResetOpen] = useState(false);
 
   const handleOpenSetupWizard = () => {
     if (onOpenSetupWizard) {
       onOpenSetupWizard();
     } else {
       setSetupWizardOpen(true);
+    }
+  };
+
+  const handleFactoryReset = () => {
+    if (onFactoryReset) {
+      onFactoryReset();
     }
   };
 
@@ -56,8 +60,6 @@ export function Toolbar({ onOpenSetupWizard, onFactoryReset }: ToolbarProps) {
               onNewTile={() => setAddUrlOpen(true)}
               onAddExistingTile={() => setAddExistingOpen(true)}
               onResetLayout={() => setResetConfirmOpen(true)}
-              onChangeMode={handleOpenSetupWizard}
-              onFactoryReset={() => setFactoryResetOpen(true)}
             />
             <WorkspaceSelector
               onNewWorkspace={() => setNewWorkspaceModalOpen(true)}
@@ -80,7 +82,10 @@ export function Toolbar({ onOpenSetupWizard, onFactoryReset }: ToolbarProps) {
         open={addExistingOpen}
         onOpenChange={setAddExistingOpen}
       />
-      <SettingsDialog />
+      <SettingsDialog
+        onOpenSetupWizard={handleOpenSetupWizard}
+        onFactoryReset={handleFactoryReset}
+      />
       <SetupWizardDialog
         open={setupWizardOpen}
         onOpenChange={setSetupWizardOpen}
@@ -100,15 +105,6 @@ export function Toolbar({ onOpenSetupWizard, onFactoryReset }: ToolbarProps) {
         onOpenChange={setResetConfirmOpen}
       />
 
-      {/* Factory Reset Confirmation */}
-      <FactoryResetDialog
-        open={factoryResetOpen}
-        onOpenChange={setFactoryResetOpen}
-        onConfirm={() => {
-          onFactoryReset?.();
-          setFactoryResetOpen(false);
-        }}
-      />
     </>
   );
 }
