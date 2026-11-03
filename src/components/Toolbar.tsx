@@ -1,5 +1,4 @@
 import {
-  Menu,
   Save,
   FolderOpen,
   ImagePlus,
@@ -11,7 +10,6 @@ import {
   LayoutGrid,
   Pencil,
   Library,
-  ChevronDown,
 } from "lucide-react";
 import { useState, useRef } from "react";
 import {
@@ -162,11 +160,58 @@ export function Toolbar() {
       <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
         <div className="flex h-14 items-center justify-between px-4 gap-4">
           <div className="flex items-center gap-3 shrink-0">
-            <img
-              src="/maco_brand_asset.png"
-              alt="Maco Logo"
-              className="h-8 w-auto object-contain"
-            />
+            <DropdownMenu>
+              <DropdownMenuTrigger className="cursor-pointer">
+                <img
+                  src="/maco_brand_asset.png"
+                  alt="Maco Logo"
+                  className="h-8 w-auto object-contain"
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    onClick={() => setAddUrlOpen(true)}
+                    className="gap-2 text-xs cursor-pointer"
+                  >
+                    <ImagePlus className="size-3.5" /> New URL
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setAddExistingOpen(true)}
+                    className="gap-2 text-xs cursor-pointer"
+                  >
+                    <Library className="size-3.5" /> Add from Existing
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    onClick={handleExport}
+                    className="gap-2 text-xs cursor-pointer"
+                  >
+                    <Save className="size-3.5" /> Export Workspaces
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => fileInputRef.current?.click()}
+                    className="gap-2 text-xs cursor-pointer"
+                  >
+                    <FolderOpen className="size-3.5" /> Import Workspaces
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setResetConfirmOpen(true)}
+                    className="gap-2 text-xs cursor-pointer"
+                  >
+                    <RotateCcw className="size-3.5" /> Reset Layout
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setSettingsOpen(true)}
+                    className="gap-2 text-xs cursor-pointer"
+                  >
+                    <Settings className="size-3.5" /> Settings
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* Workspace Selector Dropdown */}
             <DropdownMenu>
@@ -277,75 +322,13 @@ export function Toolbar() {
             )}
           </div>
 
-          {/* Actions Menu */}
-          <div className="flex items-center gap-2 shrink-0">
-            {/* Add Dropdown Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors hover:bg-muted hover:text-foreground h-8 px-2.5 gap-1.5 cursor-pointer border border-input bg-background shadow-xs">
-                <ImagePlus className="size-4" />
-                Add
-                <ChevronDown className="size-3 text-muted-foreground ml-0.5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    onClick={() => setAddUrlOpen(true)}
-                    className="gap-2 text-xs cursor-pointer"
-                  >
-                    <ImagePlus className="size-3.5" /> New URL
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setAddExistingOpen(true)}
-                    className="gap-2 text-xs cursor-pointer"
-                  >
-                    <Library className="size-3.5" /> Add from Existing
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept=".json"
-              className="hidden"
-            />
-
-            <DropdownMenu>
-              <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-lg hover:bg-muted hover:text-foreground size-8 cursor-pointer">
-                <Menu className="size-5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    onClick={handleExport}
-                    className="gap-2 cursor-pointer"
-                  >
-                    <Save className="size-4" /> Export Workspaces
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => fileInputRef.current?.click()}
-                    className="gap-2 cursor-pointer"
-                  >
-                    <FolderOpen className="size-4" /> Import Workspaces
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setResetConfirmOpen(true)}
-                    className="gap-2 cursor-pointer"
-                  >
-                    <RotateCcw className="size-4" /> Reset Layout
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setSettingsOpen(true)}
-                    className="gap-2 cursor-pointer"
-                  >
-                    <Settings className="size-4" /> Settings
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept=".json"
+            className="hidden"
+          />
         </div>
       </header>
 
