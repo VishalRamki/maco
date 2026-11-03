@@ -1,4 +1,9 @@
-import { useState, useEffect } from "react";
+/**
+ * @file AddUrlDialog.tsx
+ * @description Dialog modal for inputting a URL, auto-detecting platform, fetching metadata, and placing tile in a workspace.
+ */
+
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,15 +18,26 @@ import { Button } from "@/components/ui/button";
 import { useUrlStore } from "@/store/useUrlStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { detectPlatform, platforms } from "@/platforms";
+import type { PlatformMetadata } from "@/types";
 
-interface AddUrlDialogProps {
+/**
+ * Prop interface for `AddUrlDialog`.
+ */
+export interface AddUrlDialogProps {
+  /** Controlled open state of the dialog. */
   open: boolean;
+  /** State updater callback for the dialog. */
   onOpenChange: (open: boolean) => void;
 }
 
+/**
+ * Dialog allowing users to paste a URL and add it to an existing or active workspace.
+ */
 export function AddUrlDialog({ open, onOpenChange }: AddUrlDialogProps) {
   const [url, setUrl] = useState("");
-  const [targetWorkspaceId, setTargetWorkspaceId] = useState("");
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   const addUrl = useUrlStore((state) => state.addUrl);
@@ -31,11 +47,7 @@ export function AddUrlDialog({ open, onOpenChange }: AddUrlDialogProps) {
     (state) => state.settings.youtubeApiKey,
   );
 
-  useEffect(() => {
-    if (open) {
-      setTargetWorkspaceId(activeWorkspaceId);
-    }
-  }, [open, activeWorkspaceId]);
+  const targetWorkspaceId = selectedWorkspaceId || activeWorkspaceId;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +58,7 @@ export function AddUrlDialog({ open, onOpenChange }: AddUrlDialogProps) {
     const detected = detectPlatform(trimmedUrl);
     const platform = detected ? detected.platformKey : "unknown";
 
-    let metadata = {};
+    let metadata: PlatformMetadata = {};
     if (detected && platforms[platform]) {
       try {
         metadata = await platforms[platform].fetchMetadata(
@@ -70,6 +82,7 @@ export function AddUrlDialog({ open, onOpenChange }: AddUrlDialogProps) {
 
     setIsLoading(false);
     setUrl("");
+    setSelectedWorkspaceId(null);
     onOpenChange(false);
   };
 
@@ -101,7 +114,7 @@ export function AddUrlDialog({ open, onOpenChange }: AddUrlDialogProps) {
               <select
                 id="workspace"
                 value={targetWorkspaceId}
-                onChange={(e) => setTargetWorkspaceId(e.target.value)}
+                onChange={(e) => setSelectedWorkspaceId(e.target.value)}
                 disabled={isLoading}
                 className="w-full h-9 px-3 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
               >

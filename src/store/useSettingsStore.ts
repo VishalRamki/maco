@@ -1,9 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { Settings } from "@/types";
 
-export interface Settings {
-  youtubeApiKey: string;
-}
+export type { Settings };
 
 interface SettingsState {
   settings: Settings;

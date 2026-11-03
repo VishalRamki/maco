@@ -1,8 +1,20 @@
-import { registerPlatform } from "./index";
+/**
+ * @file vimeo.tsx
+ * @description Vimeo platform adapter supporting video ID extraction, oEmbed metadata resolution, and embedded player.
+ */
 
-function extractVimeoId(url: string): string | null {
+import { registerPlatform } from "./index";
+import type { PlatformMetadata } from "@/types";
+
+/**
+ * Extracts numeric Vimeo video ID from various Vimeo URL patterns.
+ *
+ * @param url - Vimeo video, channel, or group URL.
+ * @returns {string | null} Extracted video ID or null.
+ */
+export function extractVimeoId(url: string): string | null {
   const match = url.match(
-    /(?:vimeo\.com\/)(?:channels\/(?:\w+\/)?|groups\/[^\/]*\/videos\/|album\/\d+\/video\/|video\/|)(\d+)/,
+    /(?:vimeo\.com\/)(?:channels\/(?:\w+\/)?|groups\/[^/]*\/videos\/|album\/\d+\/video\/|video\/|)(\d+)/,
   );
   return match ? match[1] : null;
 }
@@ -10,7 +22,7 @@ function extractVimeoId(url: string): string | null {
 registerPlatform("vimeo", {
   name: "Vimeo",
   extractId: extractVimeoId,
-  fetchMetadata: async (url) => {
+  fetchMetadata: async (url): Promise<PlatformMetadata> => {
     try {
       const res = await fetch(
         `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`,

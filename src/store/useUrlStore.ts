@@ -1,34 +1,8 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import type { UrlItem, WorkspaceItem, Workspace, GridLayoutItem } from "@/types";
 
-export interface UrlItem {
-  id: number;
-  url: string;
-  platform: string;
-  title?: string;
-  author?: string;
-  description?: string;
-  thumbnailUrl?: string;
-  category?: string;
-  tags?: string[];
-  duration?: string;
-  viewCount?: string;
-  publishedAt?: string;
-}
-
-export interface WorkspaceItem {
-  id: number; // references UrlItem id
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
-export interface Workspace {
-  id: string;
-  name: string;
-  items: WorkspaceItem[];
-}
+export type { UrlItem, WorkspaceItem, Workspace };
 
 interface UrlStore {
   // Global deduplicated tile library and workspaces
@@ -61,7 +35,7 @@ interface UrlStore {
   addUrl: (item: Omit<UrlItem, "id">, targetWorkspaceId?: string) => void;
   removeUrl: (id: number) => void;
   removeTileFromWorkspace: (tileId: number, workspaceId: string) => void;
-  updateLayouts: (layout: any) => void;
+  updateLayouts: (layout: readonly GridLayoutItem[] | GridLayoutItem[]) => void;
   resetLayout: () => void;
 
   // Import / Export
@@ -259,8 +233,8 @@ export const useUrlStore = create<UrlStore>()(
           const updatedWorkspaces = state.workspaces.map((ws) => {
             if (ws.id === state.activeWorkspaceId) {
               const updatedItems = ws.items.map((item) => {
-                const itemLayout = (layout as any[]).find(
-                  (l: any) => l.i === item.id.toString(),
+                const itemLayout = layout.find(
+                  (l) => l.i === item.id.toString(),
                 );
                 if (itemLayout) {
                   return {

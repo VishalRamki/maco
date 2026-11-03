@@ -1,3 +1,8 @@
+/**
+ * @file MultiSelectFilter.tsx
+ * @description Multi-select dropdown popover for faceted filtering of platforms, categories, and tags.
+ */
+
 import * as React from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import {
@@ -14,13 +19,23 @@ import {
   CommandList,
 } from "@/components/ui/command";
 
-interface MultiSelectFilterProps {
+/**
+ * Prop interface for `MultiSelectFilter`.
+ */
+export interface MultiSelectFilterProps {
+  /** Label title displayed on the filter dropdown button (e.g. "Platform", "Tags"). */
   title: string;
+  /** Complete list of selectable options. */
   options: string[];
+  /** Array of currently selected values. */
   selected: string[];
+  /** Callback fired when selection state changes. */
   onChange: (selected: string[]) => void;
 }
 
+/**
+ * Filter dropdown popover supporting search and multi-checkbox selection.
+ */
 export function MultiSelectFilter({
   title,
   options,
@@ -39,7 +54,10 @@ export function MultiSelectFilter({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger className="inline-flex items-center justify-between gap-1 h-8 px-2.5 text-xs font-medium border border-input border-dashed rounded-md bg-background hover:bg-muted transition-colors focus:outline-none focus:ring-1 focus:ring-ring">
+      <PopoverTrigger
+        className="inline-flex items-center justify-between gap-1 h-8 px-2.5 text-xs font-medium border border-input border-dashed rounded-md bg-background hover:bg-muted transition-colors focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+        aria-label={`Filter by ${title}`}
+      >
         <span className="capitalize">{title}</span>
         {selected.length > 0 && (
           <span className="ml-1 rounded-sm bg-secondary px-1 py-0.5 text-[10px] font-normal text-secondary-foreground">

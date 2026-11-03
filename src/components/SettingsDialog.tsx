@@ -1,3 +1,9 @@
+/**
+ * @file SettingsDialog.tsx
+ * @description Application settings modal for configuring external API credentials and global options.
+ */
+
+import { Settings, RotateCcw, Key } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -10,8 +16,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { Settings, RotateCcw, Key } from "lucide-react";
 
+/**
+ * Settings configuration modal dialog.
+ */
 export function SettingsDialog() {
   const isOpen = useSettingsStore((state) => state.isOpen);
   const setIsOpen = useSettingsStore((state) => state.setIsOpen);
@@ -62,11 +70,15 @@ export function SettingsDialog() {
             variant="ghost"
             size="sm"
             onClick={resetSettings}
-            className="gap-1.5 text-xs text-muted-foreground hover:text-destructive"
+            className="gap-1.5 text-xs text-muted-foreground hover:text-destructive cursor-pointer"
           >
             <RotateCcw className="size-3.5" /> Reset Defaults
           </Button>
-          <Button type="button" onClick={() => setIsOpen(false)}>
+          <Button
+            type="button"
+            onClick={() => setIsOpen(false)}
+            className="cursor-pointer"
+          >
             Done
           </Button>
         </DialogFooter>

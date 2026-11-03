@@ -1,6 +1,18 @@
-import { registerPlatform } from "./index";
+/**
+ * @file twitch.tsx
+ * @description Twitch platform adapter for livestreams, clips, and past broadcasts.
+ */
 
-function extractTwitchInfo(url: string): string | null {
+import { registerPlatform } from "./index";
+import type { PlatformMetadata } from "@/types";
+
+/**
+ * Extracts a Twitch channel name, clip slug, or video ID from various Twitch URL patterns.
+ *
+ * @param url - Twitch live stream, video, or clip URL.
+ * @returns {string | null} Extracted channel or identifier, or null if not matched.
+ */
+export function extractTwitchInfo(url: string): string | null {
   const videoMatch = url.match(/twitch\.tv\/videos\/([0-9]+)/);
   const clipMatch =
     url.match(/clips\.twitch\.tv\/([a-zA-Z0-9_-]+)/) ||
@@ -24,7 +36,7 @@ function extractTwitchInfo(url: string): string | null {
 registerPlatform("twitch", {
   name: "Twitch",
   extractId: extractTwitchInfo,
-  fetchMetadata: async (url, id) => {
+  fetchMetadata: async (url, id): Promise<PlatformMetadata> => {
     try {
       const response = await fetch(
         `https://api.twitch.tv/v5/oembed?url=${encodeURIComponent(url)}`,
@@ -40,7 +52,7 @@ registerPlatform("twitch", {
         };
       }
     } catch {
-      // Fallback
+      // Fallback below
     }
     return {
       title: `Twitch Stream (${id})`,
@@ -50,8 +62,10 @@ registerPlatform("twitch", {
     };
   },
   EmbedComponent: ({ url, title }) => {
-    // This will now cleanly evaluate to "localhost" in both dev and production builds
-    const parentDomain = window.location.hostname || "localhost";
+    const parentDomain =
+      typeof window !== "undefined"
+        ? window.location.hostname || "localhost"
+        : "localhost";
 
     const videoMatch = url.match(/twitch\.tv\/videos\/([0-9]+)/);
     const clipMatch =

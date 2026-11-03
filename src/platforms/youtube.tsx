@@ -1,6 +1,17 @@
-// src/platforms/youtube.tsx
-import { registerPlatform } from "./index";
+/**
+ * @file youtube.tsx
+ * @description YouTube platform adapter supporting ID extraction, YouTube Data API v3 & oEmbed metadata fetching, and embedded player.
+ */
 
+import { registerPlatform } from "./index";
+import type { PlatformMetadata } from "@/types";
+
+/**
+ * Extracts an 11-character YouTube video ID from various YouTube URL formats.
+ *
+ * @param url - YouTube watch, embed, short, or youtu.be URL.
+ * @returns {string | null} The 11-character video ID, or null if not detected.
+ */
 export function extractYouTubeVideoId(url: string): string | null {
   // Direct regex checks for common short/embed links
   const patterns = [
@@ -35,8 +46,8 @@ export function extractYouTubeVideoId(url: string): string | null {
 registerPlatform("youtube", {
   name: "YouTube",
   extractId: extractYouTubeVideoId,
-  fetchMetadata: async (url, videoId, youtubeApiKey) => {
-    let metadata = {};
+  fetchMetadata: async (url, videoId, youtubeApiKey): Promise<PlatformMetadata> => {
+    let metadata: PlatformMetadata = {};
     let dataFetched = false;
 
     if (youtubeApiKey) {

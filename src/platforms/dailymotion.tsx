@@ -1,6 +1,18 @@
-import { registerPlatform } from "./index";
+/**
+ * @file dailymotion.tsx
+ * @description Dailymotion platform adapter supporting video ID extraction, oEmbed metadata resolution, and embedded player.
+ */
 
-function extractDailymotionId(url: string): string | null {
+import { registerPlatform } from "./index";
+import type { PlatformMetadata } from "@/types";
+
+/**
+ * Extracts alphanumeric Dailymotion video ID from standard or shortened URLs.
+ *
+ * @param url - Dailymotion video URL (e.g. `dailymotion.com/video/x123` or `dai.ly/x123`).
+ * @returns {string | null} Extracted video ID or null.
+ */
+export function extractDailymotionId(url: string): string | null {
   const match = url.match(
     /(?:dailymotion\.com\/video\/|dai\.ly\/)([a-zA-Z0-9]+)/,
   );
@@ -10,7 +22,7 @@ function extractDailymotionId(url: string): string | null {
 registerPlatform("dailymotion", {
   name: "Dailymotion",
   extractId: extractDailymotionId,
-  fetchMetadata: async (url) => {
+  fetchMetadata: async (url): Promise<PlatformMetadata> => {
     try {
       const res = await fetch(
         `https://www.dailymotion.com/services/oembed?url=${encodeURIComponent(url)}`,
