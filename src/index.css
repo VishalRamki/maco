@@ -157,3 +157,35 @@ main::-webkit-scrollbar-thumb {
   background-clip: padding-box;
   border-radius: 10px;
 }
+
+.react-grid-item > .react-resizable-handle.react-resizable-handle-se {
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.react-grid-item > .react-resizable-handle.react-resizable-handle-se::after {
+  right: 7px;
+  bottom: 7px;
+  width: 8px;
+  height: 8px;
+  border-right-color: var(--foreground);
+  border-bottom-color: var(--foreground);
+}
+
+.react-grid-item:hover > .react-resizable-handle.react-resizable-handle-se,
+.react-grid-item > .react-resizable-handle.react-resizable-handle-se:hover,
+.react-grid-item > .react-resizable-handle.react-resizable-handle-se:active,
+.react-grid-item > .react-resizable-handle.react-resizable-handle-se:focus-visible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .react-grid-item > .react-resizable-handle.react-resizable-handle-se {
+    transition: none;
+  }
+}
