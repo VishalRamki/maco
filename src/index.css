@@ -129,3 +129,31 @@
     @apply font-sans;
   }
 }
+
+/* Tauri custom title bar drag regions */
+.app-drag {
+  app-region: drag;
+}
+.app-no-drag {
+  app-region: no-drag;
+}
+
+/* Offset scrollbar so it starts below the sticky toolbar (h-14 = 56px) */
+main {
+  scroll-padding-top: 56px;
+}
+
+/* Hide scrollbar arrows and offset the thumb using transparent borders */
+main::-webkit-scrollbar-button {
+  display: none;
+}
+main::-webkit-scrollbar-track {
+  background: transparent;
+}
+main::-webkit-scrollbar-thumb {
+  border-top: 56px solid transparent;
+  border-bottom: 56px solid transparent;
+  background-color: oklch(0.556 0 0 / 0.3);
+  background-clip: padding-box;
+  border-radius: 10px;
+}
