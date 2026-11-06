@@ -42,7 +42,7 @@ export function AddExistingTileDialog({
 
   const currentWorkspace = workspaces.find((w) => w.id === activeWorkspaceId);
   const activeWorkspaceItemIds = new Set(
-    currentWorkspace?.items.map((i) => i.id) || [],
+    currentWorkspace?.items?.map((i) => i.id) || [],
   );
 
   const allTiles = Object.values(tiles);
