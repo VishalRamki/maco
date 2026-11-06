@@ -14,6 +14,7 @@ interface SettingsState {
 
 const defaultSettings: Settings = {
   youtubeApiKey: "",
+  serverApiKey: "",
 };
 
 export const useSettingsStore = create<SettingsState>()(

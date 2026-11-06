@@ -221,8 +221,8 @@ export function SetupWizardDialog({
                   onChange={(e) => setApiKeyLocal(e.target.value)}
                 />
                 <span className="text-xs text-muted-foreground">
-                  Your authentication key for the server. This is kept in memory
-                  only.
+                  Your authentication key for the server. This is saved locally
+                  on your device.
                 </span>
               </div>
 

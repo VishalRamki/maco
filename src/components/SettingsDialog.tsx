@@ -69,6 +69,7 @@ function GeneralSection() {
 function ApiKeysSection() {
   const settings = useSettingsStore((state) => state.settings);
   const updateSettings = useSettingsStore((state) => state.updateSettings);
+  const setApiKey = useModeStore((state) => state.setApiKey);
 
   return (
     <div className="flex flex-col gap-4">
@@ -90,6 +91,28 @@ function ApiKeysSection() {
         />
         <span className="text-xs text-muted-foreground">
           Required for fetching YouTube video metadata and playlist details.
+        </span>
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label
+          htmlFor="server-api-key"
+          className="flex items-center gap-1.5 font-medium"
+        >
+          <Key className="size-4 text-muted-foreground" />
+          Server API Key
+        </Label>
+        <Input
+          id="server-api-key"
+          type="password"
+          placeholder="sk-..."
+          value={settings.serverApiKey || ""}
+          onChange={(e) => {
+            updateSettings({ serverApiKey: e.target.value });
+            setApiKey(e.target.value);
+          }}
+        />
+        <span className="text-xs text-muted-foreground">
+          Used for authenticating requests to the backend server.
         </span>
       </div>
     </div>

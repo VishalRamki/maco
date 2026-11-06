@@ -35,7 +35,7 @@ export const useModeStore = create<ModeState>()(
     }),
     {
       name: "maco-mode-config",
-      partialize: (state) => ({ mode: state.mode, endpointUrl: state.endpointUrl }),
+      partialize: (state) => ({ mode: state.mode, endpointUrl: state.endpointUrl, apiKey: state.apiKey }),
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.hydrated = true;
