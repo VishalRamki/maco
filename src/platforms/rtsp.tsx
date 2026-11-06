@@ -38,6 +38,15 @@ export function getSafeStreamName(url: string): string {
   }
 }
 
+export function getSafeServerStreamName(url: string): string {
+  try {
+    const encoded = btoa(encodeURIComponent(url));
+    return "tile-" + encoded.replace(/[^a-zA-Z0-9]/g, "").slice(0, 16);
+  } catch {
+    return "tile-" + Math.random().toString(36).substring(2, 10);
+  }
+}
+
 registerPlatform("rtsp", {
   name: "RTSP Camera",
   extractId: extractRtspUrl,
@@ -86,7 +95,7 @@ registerPlatform("rtsp", {
       );
     }
 
-    const streamName = getSafeStreamName(streamUrl);
+    const streamName = getSafeServerStreamName(streamUrl);
     const gatewayPort = 1984;
     const embedSrc = `http://127.0.0.1:${gatewayPort}/stream.html?src=${streamName}&autoplay=1&muted=1&webrtc=smooth`;
 

@@ -27,9 +27,11 @@ export function TileEmbed({ url, platform, title }: TileEmbedProps) {
   const mode = useModeStore((s) => s.mode);
 
   // In server mode, route all tiles through the local go2rtc iframe
+  console.log(mode === "server");
   if (mode === "server") {
-    const key = getSafeStreamName(url);
-    const embedSrc = `http://localhost:1984/stream.html?src=${key}&autoplay=1&muted=1&webrtc=smooth`;
+    console.log("WE IN SERVER");
+    // const key = getSafeStreamName(url);
+    const embedSrc = `http://localhost:1984/stream.html?src=tile-${url}&autoplay=1&muted=1&webrtc=smooth`;
     return (
       <div className="flex flex-col h-full w-full bg-black relative overflow-hidden">
         <iframe

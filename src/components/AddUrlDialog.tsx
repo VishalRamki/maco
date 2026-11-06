@@ -20,7 +20,7 @@ import { useUrlStore } from "@/store/useUrlStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { detectPlatform, platforms } from "@/platforms";
 import type { PlatformMetadata } from "@/types";
-
+import { v4 as uuidv4 } from "uuid";
 /**
  * Prop interface for `AddUrlDialog`.
  */
@@ -137,6 +137,7 @@ export function AddUrlDialog({ open, onOpenChange }: AddUrlDialogProps) {
     addUrl(
       {
         url: trimmedUrl,
+        systemId: uuidv4(),
         platform,
         ...metadata,
         ...merged,

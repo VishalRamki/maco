@@ -31,6 +31,7 @@ export interface UrlItem {
   viewCount?: string;
   /** Publication timestamp or date string. */
   publishedAt?: string;
+  systemId?: string;
 }
 
 /**

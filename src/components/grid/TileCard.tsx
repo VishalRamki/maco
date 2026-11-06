@@ -8,6 +8,7 @@ import { TileHeader } from "./TileHeader";
 import { TileEmbed } from "@/components/TileEmbed";
 import { cn } from "@/lib/utils";
 import type { ActiveTileItem, Workspace } from "@/types";
+import { useModeStore } from "@/store/useModeStore";
 
 /**
  * Prop interface for `TileCard`.
@@ -46,6 +47,9 @@ export const TileCard = React.forwardRef<HTMLDivElement, TileCardProps>(
     },
     ref,
   ) => {
+    const mode = useModeStore((s) => s.mode);
+    console.log(mode);
+    console.log(mode === "server" ? (tile.systemId ?? "") : tile.url);
     return (
       <div
         ref={ref}
@@ -66,7 +70,7 @@ export const TileCard = React.forwardRef<HTMLDivElement, TileCardProps>(
         />
         <div className="bg-background flex-1 overflow-hidden flex flex-col w-full h-full">
           <TileEmbed
-            url={tile.url}
+            url={mode === "server" ? (tile.systemId ?? "") : tile.url}
             platform={tile.platform}
             title={tile.title}
           />
